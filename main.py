@@ -1,6 +1,8 @@
-import os, sys, shutil, random
+import os, sys, shutil, random, pystray
 import tkinter as tk
 from pathlib import Path
+from PIL import Image, ImageDraw
+
 
 
 window = tk.Tk()
@@ -30,24 +32,51 @@ for folder in dict:
 
 Dict = {".exe":exe_path, ".jpg":pic_path, ".xls":document_path, ".csv":document_path, ".xlsx":document_path, ".pdf":document_path, ".zip":zip_path}
 
-while program_life:
-    # Creates a list of any files in downloads
-    dir_list = os.listdir(download_path)
+# while program_life:
+#     # Creates a list of any files in downloads
+#     dir_list = os.listdir(download_path)
 
-    # checks download directory size 
-    directory_size = len(dir_list)
+#     # checks download directory size 
+#     directory_size = len(dir_list)
 
-    # if download directory size is more than 0 loop well run
-    while directory_size > 0:
-        dir_list = os.listdir(download_path)
-        directory_size = len(dir_list)
+#     # if download directory size is more than 0 loop well run
+#     while directory_size > 0:
+#         dir_list = os.listdir(download_path)
+#         directory_size = len(dir_list)
 
-        for files in dir_list:
-            split = os.path.splitext(files)
-            dict_check = Dict.get(split[1])
+#         for files in dir_list:
+#             split = os.path.splitext(files)
+#             dict_check = Dict.get(split[1])
 
-            if dict_check == None:
-                shutil.move(f"{download_path}/{files}", f"{random_path}/{files}")
-            else:
-                shutil.move(f"{download_path}/{files}", f"{dict_check}/{files}")
+#             if dict_check == None:
+#                 shutil.move(f"{download_path}/{files}", f"{random_path}/{files}")
+#             else:
+#                 shutil.move(f"{download_path}/{files}", f"{dict_check}/{files}")
  
+def create_image(width, height, color1, color2):
+    # Generate an image and draw a pattern
+    image = Image.new('RGB', (width, height), color1)
+    dc = ImageDraw.Draw(image)
+    dc.rectangle(
+        (width // 2, 0, width, height // 2),
+        fill=color2)
+    dc.rectangle(
+        (0, height // 2, width // 2, height),
+        fill=color2)
+
+    return image
+
+def program_status(icon, item):
+    if str(item) == "Exit":
+        icon.stop()
+
+
+# In order for the icon to be displayed, you must provide an icon
+icon = pystray.Icon(
+    'File Organizer', icon=create_image(64, 64, 'black', 'white'), menu=pystray.Menu(
+        pystray.MenuItem("Exit", program_status)
+    ))
+
+
+# To finally show you icon, call run
+icon.run()

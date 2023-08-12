@@ -1,4 +1,4 @@
-import os, sys, shutil, random, pystray
+import os, sys, shutil, random, pystray, threading
 import tkinter as tk
 from pathlib import Path
 from PIL import Image, ImageDraw
@@ -6,7 +6,6 @@ from PIL import Image, ImageDraw
 
 
 window = tk.Tk()
-
 # Paths of all directorys being used
 download_path = Path.home()/ "Downloads"
 desktop_path = Path.home()/ "Desktop"
@@ -41,47 +40,53 @@ def program_status(icon, item):
         program_life = False
 
 
-# In order for the icon to be displayed, you must provide an icon
-icon = pystray.Icon(
-    'File Organizer', icon=create_image(64, 64, 'black', 'white'), menu=pystray.Menu(
-        pystray.MenuItem("Stop Loop", program_status),
-        pystray.MenuItem("Exit", program_status)
-    ))
+def run_icon():
+    # In order for the icon to be displayed, you must provide an icon
+    icon = pystray.Icon(
+        'File Organizer', icon=create_image(64, 64, 'black', 'white'), menu=pystray.Menu(
+            pystray.MenuItem("Stop Loop", program_status),
+            pystray.MenuItem("Exit", program_status)
+        ))
 
-# To finally show you icon, call run
-icon.run_detached()
+    # To finally show you icon, call run
+    icon.run()
 
+def main_loop():
+    for folder in dict:
+        try:
+            if os.path.exists(folder):
+                print(f"Path Exists for {folder}" )
+            else:
+                os.mkdir(folder)
+        except ValueError:
+            print(ValueError)
 
-for folder in dict:
-    try:
-        if os.path.exists(folder):
-            print(f"Path Exists for {folder}" )
-        else:
-            os.mkdir(folder)
-    except ValueError:
-        print(ValueError)
+    Dict = {".exe":exe_path, ".jpg":pic_path, ".xls":document_path, ".csv":document_path, ".xlsx":document_path, ".pdf":document_path, ".zip":zip_path}
 
-Dict = {".exe":exe_path, ".jpg":pic_path, ".xls":document_path, ".csv":document_path, ".xlsx":document_path, ".pdf":document_path, ".zip":zip_path}
-
-while program_life:
-    # Creates a list of any files in downloads
-    dir_list = os.listdir(download_path)
-    print('test')
-    # checks download directory size 
-    directory_size = len(dir_list)
-
-    # if download directory size is more than 0 loop well run
-    while directory_size > 0:
+    while program_life:
+        
+        # Creates a list of any files in downloads
         dir_list = os.listdir(download_path)
+
+        # checks download directory size 
         directory_size = len(dir_list)
 
-        for files in dir_list:
-            split = os.path.splitext(files)
-            dict_check = Dict.get(split[1])
+        # if download directory size is more than 0 loop well run
+        while directory_size > 0:
+            dir_list = os.listdir(download_path)
+            directory_size = len(dir_list)
 
-            if dict_check == None:
-                shutil.move(f"{download_path}/{files}", f"{random_path}/{files}")
-            else:
-                shutil.move(f"{download_path}/{files}", f"{dict_check}/{files}")
+            for files in dir_list:
+                split = os.path.splitext(files)
+                dict_check = Dict.get(split[1])
+
+                if dict_check == None:
+                    shutil.move(f"{download_path}/{files}", f"{random_path}/{files}")
+                else:
+                    shutil.move(f"{download_path}/{files}", f"{dict_check}/{files}")
  
 
+Thread1 = threading.Thread(target=run_icon)
+Thread2 = threading.Thread(target=main_loop)
+Thread1.start()
+Thread2.start()

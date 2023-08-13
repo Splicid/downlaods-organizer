@@ -34,17 +34,15 @@ def create_image(width, height, color1, color2):
 
 def program_status(icon, item):
     if str(item) == "Exit":
-        icon.stop()
-    elif str(item) == "Stop Loop":
         global program_life
         program_life = False
+        icon.stop()
 
 
 def run_icon():
     # In order for the icon to be displayed, you must provide an icon
     icon = pystray.Icon(
         'File Organizer', icon=create_image(64, 64, 'black', 'white'), menu=pystray.Menu(
-            pystray.MenuItem("Stop Loop", program_status),
             pystray.MenuItem("Exit", program_status)
         ))
 
@@ -64,7 +62,7 @@ def main_loop():
     Dict = {".exe":exe_path, ".jpg":pic_path, ".xls":document_path, ".csv":document_path, ".xlsx":document_path, ".pdf":document_path, ".zip":zip_path}
 
     while program_life:
-        
+
         # Creates a list of any files in downloads
         dir_list = os.listdir(download_path)
 
